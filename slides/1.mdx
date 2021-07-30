@@ -2,55 +2,376 @@
     
 <Cover>
 
-# NextJS MDX Deck
-    
-Create presentations using Next & React & MDX.
+<h1><img src="/ts.png" width="75"/> Typescript</h1>
+
+Why we use it and how you can better understand the benefits
 
 </Cover>
 
 ---
 
-1. Clone this project.
-1. Write some MDX.
-1. Export as [static app](https://nextjs.org/docs/advanced-features/static-html-export)
-1. ???
-1. Profit as a speaker 💰💰💰
+## Javascript is squirrelly
 
-<SpeakerNotes>
-    
-Private notes here. 
+It often doesn't work how you think it should
 
-You can write an extremely long note and it'll still display inside of the presenter mode.
+- Lets you do things that don't make much sense
+- Doesn't try to help you understand
 
-# Even Markdown!
+![x](/umm-what.jpg)
 
-- Just
-- do
-- it
+---
+## Some examples of said squirrelly-ness
+```js
+// this is valid
+var thing = [] + {};
 
-</SpeakerNotes>
+// this does not throw an error!
+thing.tier = 'premium';
+thing.size = 150;
 
+console.log(thing.size); // undefined
+
+// 'thing' is a string, imagine that!
+console.log(typeof thing); // 'string'
+console.log(thing); // '[object Object]'
+```
+
+![x](/it-hurt.png)
 
 ---
 
-> Inscrutable icons litter the face of the devices even though the research
-> community has long demonstrated that people cannot remember the meaning of
-> more than a small number of icons […] Who can remember what each icon
-> means? Not me.
-> <cite>Don Norman</cite>
+## Other Oddities
+Can you guess what 'array' + 'array' is? What SHOULD it be?
+```js
+[] + []
+```
+<small>hint: it's not like Python which smartly returns []</small>
 
 ---
 
-# 🤫
+
+Naturally it's `empty string`!
+```js
+[] + [] // ''
+```
 
 ---
 
-## Slides are written in MDX!
+How about 'array' + 'empty object literal'?
+```js
+[] + {}
+```
 
-And code is highlighted using `react-syntax-highlighter`.
+---
+
+(We just saw this one) it's a string too!
 
 ```js
-const variable = someFunction();
+[] + {} // '[object Object]'
 ```
+
+---
+
+Surely 'empty object literal' + 'array' is the same as the inverse, right?
+```js
+{} + []
+```
+---
+
+Nope, that's the number 0
+```js
+{} + [] // 0
+```
+---
+
+'empty object literal' + 'empty object literal' this is the only one that's technically correct
+```js
+{} + {}
+```
+---
+
+Obviously that's Not a Number!
+```js
+{} + {} // NaN
+```
+
+---
+
+You could argue that this is part of what makes JS good
+```js
+('b' + 'a' + + 'a' + 'a').toLowerCase();
+```
+<small>please don't ever do this</small>
+
+---
+```js
+('b' + 'a' + + 'a' + 'a').toLowerCase();
+// 'banana'
+// also, no errors!
+```
+![x](/confusing.gif)
+
+---
+
+## The Point: Javascript Is Not Obvious
+Some of these examples are a bit contrived, but the point is that it's WAY too easy to make a trivial mistake in our javascript programs.
+
+Especially when we're working on a team where our code has many thousands of lines and MUST work reliably for our customers.
+
+---
+
+## A real world example
+What do you think this function does? Try to figure it out in less than 10 seconds
+
+```js
+export function parse(str) {
+  const query = {};
+  const pairs = (str[0] === '?' ? str.substr(1) : str).split('&');
+  pairs.forEach((pair) => {
+    const [key, value] = pair.split('=');
+    query[decodeURIComponent(key)] = decodeURIComponent(value || '');
+  });
+  return query;
+}
+```
+
+<CountDown seconds={10} />
+
+---
+
+>> You spend more time looking at code you _didn't_ write than not, so how can we make that as easy to do as possible?
+
+<img src="/ts-vs-js.jpg" width="550"/>
+
+---
+
+## Describe how your code works with types!
+
+---
+## So what _is_ a type anyway?
+---
+
+### Types are anything that can be differentiated and grouped
+They serve as a way to specify how something should/can be used and prevent you from doing things that don't make sense.
+
+![](/thinking.jpg)
+
+<small>* in computer code</small>
+
+---
+
+Lets look at some examples of types using Typescript
+
+<small>All of the following code is in Typescript</small>
+
+---
+
+### Primitives are types
+
+```ts
+const n: number = 100;
+const str: string = 'Hello';
+const bool: boolean = true;
+
+n + 1 // 101
+str.length // 5
+!bool // false
+
+// Error: Type 'string' is not assignable to type 'number'.
+n + str
+
+// Error: This condition will always return 'false' since the types 'string' and 'boolean' have no overlap.
+str === bool
+
+```
+
+---
+
+### Classes are types
+
+```ts
+class HttpService {
+  get(url: string): Promise<AxiosResponse> {
+    return axios.get(url);
+  }
+}
+
+const someObject: HttpService = new HttpService();
+
+// Error: Type 'URLSearchParams' is not assignable to type 'HttpService'.
+// Types of property 'get' are incompatible.
+// Type '(name: string) => string | null' is not assignable to type '(url: string) => Promise<AxiosResponse>'.
+const wrongType: HttpService = new URLSearchParams();
+
+```
+
+---
+
+## How can we describe types in TS?
+
+1. **Interface**: the `interface` keyword describes a contract; How an object should behave and what properties it has available.
+2. **Type**: the `type` keyword is similar to interfaces, but more flexible. You can describe functions, values, and lots of other things
+3. **Inline**: inline declarations such as:
+```ts
+const query: Record<string, string> = {};
+```
+
+---
+
+## Interfaces
+`interface`s let you enforce what is allowed without needing special logic to check
+
+The Vehicle `interface` is a contract, anything that wants to be a "Vehicle" must implement everything in the interface
+
+
+```ts
+interface Vehicle {
+  accelerate(magnitude: number): void;
+  decelerate(magnitude: number): void;
+  start(): void;
+  stop(): void;
+}
+
+// A valid Vehicle
+class Car implements Vehicle {
+  private speed: number;
+  private isStarted: boolean;
+
+  public accelerate(magnitude: number): void {
+    this.speed += magnitude;
+  }
+  public decelerate(magnitude: number): void {
+    this.speed -= magnitude;
+  }
+  public start(): void {
+    this.isStarted = true;
+  }
+  public stop(): void {
+    this.isStarted = false;
+  }
+}
+
+```
+---
+
+## Type
+Similar to interfaces, but more flexible.
+`type` lets you describe functions, values, and lots of other things
+
+Revisiting our example from earlier, how quickly can you figure out what this function does?
+```ts
+type IQueryParams = Record<string, string | number | boolean | undefined>;
+
+export function parseQuery(str: string): IQueryParams {
+  const query = {};
+  const pairs = (str[0] === '?' ? str.substr(1) : str).split('&');
+  pairs.forEach((pair) => {
+    const [key, value] = pair.split('=');
+    query[decodeURIComponent(key)] = decodeURIComponent(value || '');
+  });
+  return query;
+}
+
+// Argument of type 'number' is not assignable to parameter of type 'string'.
+parseQuery(42);
+
+// Argument of type 'string[]' is not assignable to parameter of type 'string'.
+parseQuery(['hello!']);
+
+parseQuery('?deviceType=phone&token=AABBCC123&ts=9861243');
+// { deviceType: 'phone', token: 'AABBCC123', ts: 9861243 }
+```
+
+---
+
+## Inline types
+
+```ts
+function printId(id: number | string) {
+  console.log("Your ID is: " + id);
+}
+// OK
+printId(101);
+// OK
+printId("202");
+// Error
+printId({ myID: 22342 });
+// Argument of type '{ myID: number; }' is not assignable to parameter of type 'string | number'.
+// Type '{ myID: number; }' is not assignable to type 'number'.
+
+```
+
+---
+
+## Inferred types
+Sometimes typescript knows how to understand your code without any extra work on your part
+
+```ts
+const user = { name: 'jack', age: 25 }
+
+// Error
+console.log(user.id)
+// Property 'id' does not exist on type '{ name: string; age: number; }'.
+
+```
+
+---
+
+## Other reasons TS is awesome 🎉
+
+---
+
+## Intellisense
+![](/intellisense.gif)
+
+---
+
+## Auto import
+![](/auto-import.png)
+
+---
+
+## Refactoring
+<img src="/refactor.gif" width="800" />
+
+
+---
+
+## No overhead
+*Typescript does not change how your code actually executes.
+
+This means you can write your application in a safer way without any performance loss.
+
+```ts
+const something: string = 'A STRING';
+const transform = (s: string): string => s.toLowerCase();
+transform(something);
+```
+
+_Results in_
+
+```js
+"use strict";
+const something = 'A STRING';
+const transform = (s) => s.toLowerCase();
+transform(something);
+```
+<small>*There are exceptions to this, but most of the time you won't have to worry about it</small>
+
+---
+
+# QA ❔
+
+---
+
+## Thanks! 🤠
+
+---
+
+## Resources
+
+- [Gary Bernhardt's wat talk](https://www.destroyallsoftware.com/talks/wat)
+- [Typescript docs](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html)
+
 
 </SlidePage>

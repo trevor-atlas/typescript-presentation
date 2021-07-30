@@ -1,13 +1,13 @@
-import fs from 'fs'
-import path from 'path'
-import Head from 'next/head'
-import dynamic from 'next/dynamic'
-import Header from '../../components/Header'
-import { TotalPagesContext } from '../../context/TotalPagesContext'
-import { siteConfig } from '../../site.config.js'
+import fs from 'fs';
+import path from 'path';
+import Head from 'next/head';
+import dynamic from 'next/dynamic';
+import Header from '../../components/Header';
+import { TotalPagesContext } from '../../context/TotalPagesContext';
+import { siteConfig } from '../../site.config.js';
 
 const SlideshowPage = ({ totalSlidePages, currentSlide, filename }) => {
-  const MDXContent = dynamic(() => import(`../../${filename}`))
+  const MDXContent = dynamic(() => import(`../../${filename}`));
   return (
     <TotalPagesContext.Provider value={totalSlidePages}>
       <Head>
@@ -15,8 +15,10 @@ const SlideshowPage = ({ totalSlidePages, currentSlide, filename }) => {
           {siteConfig.name} - {siteConfig.title}
         </title>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Quattrocento&family=Quattrocento+Sans&display=swap"
           rel="stylesheet"
         />
       </Head>
@@ -28,14 +30,14 @@ const SlideshowPage = ({ totalSlidePages, currentSlide, filename }) => {
       />
       <MDXContent />
     </TotalPagesContext.Provider>
-  )
-}
+  );
+};
 
 export async function getStaticProps({ params }) {
-  const filename = path.join('slides', `${params.slide}.mdx`)
-  const slidesDirectory = path.join(process.cwd(), 'slides')
-  const mdxFiles = fs.readdirSync(slidesDirectory)
-  const totalSlidePages = mdxFiles.length
+  const filename = path.join('slides', `${params.slide}.mdx`);
+  const slidesDirectory = path.join(process.cwd(), 'slides');
+  const mdxFiles = fs.readdirSync(slidesDirectory);
+  const totalSlidePages = mdxFiles.length;
 
   return {
     props: {
@@ -43,23 +45,23 @@ export async function getStaticProps({ params }) {
       currentSlide: params.slide,
       filename,
     },
-  }
+  };
 }
 
 export async function getStaticPaths() {
-  const postsDirectory = path.join(process.cwd(), 'slides')
-  const mdxFiles = fs.readdirSync(postsDirectory)
+  const postsDirectory = path.join(process.cwd(), 'slides');
+  const mdxFiles = fs.readdirSync(postsDirectory);
   // Loop through all post files and create array of slugs (to create links)
   const paths = mdxFiles.map((filename) => ({
     params: {
       slide: filename.replace('.mdx', ''),
     },
-  }))
+  }));
 
   return {
     paths,
     fallback: false,
-  }
+  };
 }
 
-export default SlideshowPage
+export default SlideshowPage;

@@ -13,13 +13,13 @@ import { MODES } from '../constants/modes'
 
 const GlobalStyle = createGlobalStyle`
   :root {
-    --bg: #252535;
+    --bg: RGB(38, 38, 38);
     --meta: #888;
     --accent: rgb(0, 92, 221);
-    --text: #FDFDFF;
-    --base: 1.5rem;
+    --text: RGB(226, 223, 218);
+    --base: 24px;
     --code: 1rem;
-    --heading-font-family: "Poppins";
+    --heading-font-family: "Quattrocento";
     --heading-font-weight: 800;
   }
 
@@ -35,13 +35,13 @@ const GlobalStyle = createGlobalStyle`
 
   body,
   html {
-    font-family: "Roboto", -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
+    font-family: "Quattrocento Sans", -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
       sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
     font-size: var(--base);
     -webkit-font-smoothing: antialiased;
     font-feature-settings: 'calt', 'liga', 'hist', 'onum', 'pnum';
+    line-height: 1.75;
 
-    overflow: auto;
 
     width: 100%;
     height: 100%;
@@ -54,12 +54,10 @@ const GlobalStyle = createGlobalStyle`
 
   #slide {
     display: flex;
-    overflow: hidden;
     justify-content: center;
     align-items: center;
-
+min-height: 100vh;
     width: 100vw;
-    height: 100vh;
     padding: 1rem;
 
     text-align: center;
@@ -139,20 +137,19 @@ const GlobalStyle = createGlobalStyle`
   }
 
   pre {
-    font-size: 0.75em !important;
-
     display: inline-block;
-    overflow-x: scroll;
-
-    margin: 2rem 0;
-
+    margin: 1rem 0;
     text-align: left;
-
     color: var(--accent);
+    overflow-wrap: normal;
+    white-space: pre-wrap;
   }
+
+  small, .text_small {font-size: 0.75rem;}
 
   code {
     font-family: menlo, monospace;
+    overflow-wrap: normal;
   }
 
   a:hover {
@@ -162,7 +159,7 @@ const GlobalStyle = createGlobalStyle`
   h1 {
     font-family: var(--heading-font-family);
     font-weight: var(--heading-font-weight);
-    font-size: 200%;
+    font-size: 4.209rem;
 
     margin-bottom: 0.5rem;
   }
@@ -170,9 +167,14 @@ const GlobalStyle = createGlobalStyle`
   h2 {
     font-family: var(--heading-font-family);
     font-weight: var(--heading-font-weight);
-    font-size: 120%;
+    font-size: 3.157rem;
 
     margin-bottom: 0.5rem;
+  }
+
+  h3 {
+    font-family: var(--heading-font-family);
+    font-size: 2.369rem;
   }
 
   p {
