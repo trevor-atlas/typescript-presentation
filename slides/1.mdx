@@ -36,7 +36,9 @@ console.log(typeof thing); // 'string'
 console.log(thing); // '[object Object]'
 ```
 
-![x](/it-hurt.png)
+---
+
+![x](/wtf.jpg)
 
 ---
 
@@ -50,7 +52,10 @@ Can you guess what 'array' + 'array' is? What SHOULD it be?
 ---
 
 
+<SpeakerNotes>
 Naturally it's `empty string`!
+</SpeakerNotes>
+
 ```js
 [] + [] // ''
 ```
@@ -64,7 +69,9 @@ How about 'array' + 'empty object literal'?
 
 ---
 
+<SpeakerNotes>
 (We just saw this one) it's a string too!
+</SpeakerNotes>
 
 ```js
 [] + {} // '[object Object]'
@@ -78,19 +85,28 @@ Surely 'empty object literal' + 'array' is the same as the inverse, right?
 ```
 ---
 
+<SpeakerNotes>
 Nope, that's the number 0
+</SpeakerNotes>
+
 ```js
 {} + [] // 0
 ```
 ---
 
-'empty object literal' + 'empty object literal' this is the only one that's technically correct
+'empty object literal' + 'empty object literal' 
 ```js
 {} + {}
 ```
+
+<small>This is the only one that's technically correct</small>
+
 ---
 
+<SpeakerNotes>
 Obviously that's Not a Number!
+</SpeakerNotes>
+
 ```js
 {} + {} // NaN
 ```
@@ -116,7 +132,9 @@ You could argue that this is part of what makes JS good
 ## The Point: Javascript Is Not Obvious
 Some of these examples are a bit contrived, but the point is that it's WAY too easy to make a trivial mistake in our javascript programs.
 
+<SpeakerNotes>
 Especially when we're working on a team where our code has many thousands of lines and MUST work reliably for our customers.
+</SpeakerNotes>
 
 ---
 
@@ -143,16 +161,27 @@ export function parse(str) {
 
 <img src="/ts-vs-js.jpg" width="550"/>
 
+<SpeakerNotes>
+  Ideally, we don't want to have to read every line of code in order to understand the general goal
+</SpeakerNotes>
+
 ---
 
 ## Describe how your code works with types!
+
+<SpeakerNotes>
+  Typescript's solution to this problem: Describe how your code works in a way that is human readable and programmatically verifiable
+</SpeakerNotes>
 
 ---
 ## So what _is_ a type anyway?
 ---
 
 ### Types are anything that can be differentiated and grouped
-They serve as a way to specify how something should/can be used and prevent you from doing things that don't make sense.
+
+<SpeakerNotes>
+They serve as a way to specify how something should / can be used and help prevent you from doing things that don't make sense.
+</SpeakerNotes>
 
 ![](/thinking.jpg)
 
@@ -160,9 +189,11 @@ They serve as a way to specify how something should/can be used and prevent you 
 
 ---
 
-Lets look at some examples of types using Typescript
+Some examples of types using Typescript
 
 <small>All of the following code is in Typescript</small>
+
+![](/good-better.png)
 
 ---
 
@@ -172,6 +203,7 @@ Lets look at some examples of types using Typescript
 const n: number = 100;
 const str: string = 'Hello';
 const bool: boolean = true;
+const N: bigint = Number.MAX_SAFE_INTEGER + 1n;
 
 n + 1 // 101
 str.length // 5
@@ -185,6 +217,10 @@ str === bool
 
 ```
 
+<SpeakerNotes>
+  Here we see some primitive data types where each one behaves as we would expect, but with typescript we get some (probably obvious) errors when we attempt to do squirrelly things 
+</SpeakerNotes>
+
 ---
 
 ### Classes are types
@@ -196,32 +232,45 @@ class HttpService {
   }
 }
 
-const someObject: HttpService = new HttpService();
+let someObject: HttpService = new HttpService();
 
 // Error: Type 'URLSearchParams' is not assignable to type 'HttpService'.
 // Types of property 'get' are incompatible.
 // Type '(name: string) => string | null' is not assignable to type '(url: string) => Promise<AxiosResponse>'.
-const wrongType: HttpService = new URLSearchParams();
+someObject = new URLSearchParams();
 
 ```
+
+<SpeakerNotes>
+  Classes are types. Here we declare 'someObject' as the type HttpService and everthing works great, but if we try to assign something else we get a typeError
+</SpeakerNotes>
 
 ---
 
 ## How can we describe types in TS?
 
-1. **Interface**: the `interface` keyword describes a contract; How an object should behave and what properties it has available.
-2. **Type**: the `type` keyword is similar to interfaces, but more flexible. You can describe functions, values, and lots of other things
-3. **Inline**: inline declarations such as:
+1. **`interface`**
+2. **`type`**
+3. **`inline`**: inline declarations such as:
 ```ts
 const query: Record<string, string> = {};
 ```
+
+<SpeakerNotes>
+
+- the `interface` keyword describes a contract; How an object should behave and what properties it has available.  
+- the `type` keyword is similar to interfaces, but more flexible. You can describe functions, values, and lots of other things
+
+</SpeakerNotes>
 
 ---
 
 ## Interfaces
 `interface`s let you enforce what is allowed without needing special logic to check
 
+<SpeakerNotes>
 The Vehicle `interface` is a contract, anything that wants to be a "Vehicle" must implement everything in the interface
+</SpeakerNotes>
 
 
 ```ts
@@ -256,20 +305,32 @@ class Car implements Vehicle {
 
 ## Type
 Similar to interfaces, but more flexible.
-`type` lets you describe functions, values, and lots of other things
 
+<SpeakerNotes>
+`type` lets you describe objects, functions, values, and lots of other things.
+</SpeakerNotes>
+
+```ts
+type IQueryParams = Record<string, string | number | boolean | undefined>;
+
+type Modality = 'strength' | 'cycle' | 'run' | 'row';
+
+type Payload = {
+  userID: string;
+};
+```
+
+---
+
+<SpeakerNotes>
 Revisiting our example from earlier, how quickly can you figure out what this function does?
+</SpeakerNotes>
+
 ```ts
 type IQueryParams = Record<string, string | number | boolean | undefined>;
 
 export function parseQuery(str: string): IQueryParams {
-  const query = {};
-  const pairs = (str[0] === '?' ? str.substr(1) : str).split('&');
-  pairs.forEach((pair) => {
-    const [key, value] = pair.split('=');
-    query[decodeURIComponent(key)] = decodeURIComponent(value || '');
-  });
-  return query;
+  // You might not even need to read code sometimes
 }
 
 // Argument of type 'number' is not assignable to parameter of type 'string'.
@@ -285,6 +346,10 @@ parseQuery('?deviceType=phone&token=AABBCC123&ts=9861243');
 ---
 
 ## Inline types
+
+<SpeakerNotes>
+  Finally we reach inline types, which are as simple as they sound. Declare your types inline with their use!
+</SpeakerNotes>
 
 ```ts
 function printId(id: number | string) {
@@ -304,7 +369,13 @@ printId({ myID: 22342 });
 ---
 
 ## Inferred types
-Sometimes typescript knows how to understand your code without any extra work on your part
+<SpeakerNotes>
+Sometimes typescript knows how to understand your code without any extra work on your part.  
+
+Here we create an object literal called `user` and assign a name and age, but on line 4 we try to access an 'id' property that doesn't exist.  
+
+Typescript catches this error for us automatically
+</SpeakerNotes>
 
 ```ts
 const user = { name: 'jack', age: 25 }
@@ -317,7 +388,10 @@ console.log(user.id)
 
 ---
 
-## Other reasons TS is awesome 🎉
+## Typescript gives us powerful tools
+<SpeakerNotes>
+THE POINT: It allows us to describe how we intend our programs to work, and helps guide us when we change things
+</SpeakerNotes>
 
 ---
 
@@ -334,11 +408,19 @@ console.log(user.id)
 ## Refactoring
 <img src="/refactor.gif" width="800" />
 
+---
+
+## Things to remember
+
+<small>About Typescript 😄</small>
 
 ---
 
-## No overhead
-*Typescript does not change how your code actually executes.
+![](/ts-runtime.jpg)
+
+---
+
+## Typescript does not change how your code actually executes.
 
 This means you can write your application in a safer way without any performance loss.
 
@@ -346,6 +428,7 @@ This means you can write your application in a safer way without any performance
 const something: string = 'A STRING';
 const transform = (s: string): string => s.toLowerCase();
 transform(something);
+
 ```
 
 _Results in_
@@ -355,12 +438,24 @@ _Results in_
 const something = 'A STRING';
 const transform = (s) => s.toLowerCase();
 transform(something);
+
 ```
 <small>*There are exceptions to this, but most of the time you won't have to worry about it</small>
 
 ---
 
-# QA ❔
+## `any` is evil
+![](/ts-defeat.jpg)
+
+---
+
+`any` is equivalent to driving over a safety barrier, crashing down the mountainside while your car explodes in flames and finally landing in a river where fresh water sharks violently consume you.
+
+![](/this-is-fine.gif)
+
+---
+
+# QA
 
 ---
 
